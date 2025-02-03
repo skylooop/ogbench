@@ -6,3 +6,7 @@ dist/
 .DS_Store
 .idea/
 .ruff_cache/
+wandb/
+**/exp/
+outputs/
+**/outputs/

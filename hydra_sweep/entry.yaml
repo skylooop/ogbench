@@ -1,0 +1,24 @@
+defaults:
+  - logging: wandb
+
+seed: 42
+env_name: antmaze-large-navigate-v0
+save_dir: impls/exp/
+restore_path: null
+restore_epoch: null
+
+train_steps: 1_000_000
+log_interval: 5_000
+eval_interval: 100_000
+save_interval: 1_000_000
+
+eval_tasks: null
+eval_episodes: 1
+eval_temperature: 0
+eval_gaussian: null
+video_episodes: 1
+video_frame_skip: 3
+eval_on_cpu: 0
+
+
+

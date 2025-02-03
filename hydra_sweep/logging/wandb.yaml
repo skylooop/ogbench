@@ -1,0 +1,9 @@
+_target_: impls.utils.log_utils.setup_wandb
+_partial_: True
+
+mode: offline
+save_code: False
+
+group: Debug
+project: OGBench
+entity: null

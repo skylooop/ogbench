@@ -1,0 +1,4 @@
+[2025-02-03 17:17:42,154][OpenGL.acceleratesupport][INFO] - No OpenGL_accelerate module loaded: No module named 'OpenGL_accelerate'
+[2025-02-03 17:23:09,728][py.warnings][WARNING] - /home/m_bobrin/miniconda3/envs/jax/lib/python3.10/site-packages/tqdm/std.py:161: TqdmWarning: Unknown colour (orange); valid choices: [hex (#00ff00), BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE]
+  self.colour = colour
+

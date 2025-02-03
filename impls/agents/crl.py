@@ -5,9 +5,9 @@ import jax
 import jax.numpy as jnp
 import ml_collections
 import optax
-from utils.encoders import GCEncoder, encoder_modules
-from utils.flax_utils import ModuleDict, TrainState, nonpytree_field
-from utils.networks import GCActor, GCBilinearValue, GCDiscreteActor, GCDiscreteBilinearCritic
+from impls.utils.encoders import GCEncoder, encoder_modules
+from impls.utils.flax_utils import ModuleDict, TrainState, nonpytree_field
+from impls.utils.networks import GCActor, GCBilinearValue, GCDiscreteActor, GCDiscreteBilinearCritic
 
 
 class CRLAgent(flax.struct.PyTreeNode):
@@ -304,13 +304,14 @@ class CRLAgent(flax.struct.PyTreeNode):
 
 def get_config():
     config = ml_collections.ConfigDict(
+        # all hyperparams chosen as in paper in offline rl section
         dict(
             # Agent hyperparameters.
             agent_name='crl',  # Agent name.
             lr=3e-4,  # Learning rate.
             batch_size=1024,  # Batch size.
-            actor_hidden_dims=(512, 512, 512),  # Actor network hidden dimensions.
-            value_hidden_dims=(512, 512, 512),  # Value network hidden dimensions.
+            actor_hidden_dims=(1024, 1024),  # Actor network hidden dimensions.
+            value_hidden_dims=(1024, 1024),  # Value network hidden dimensions.
             latent_dim=512,  # Latent dimension for phi and psi.
             layer_norm=True,  # Whether to use layer normalization.
             discount=0.99,  # Discount factor.

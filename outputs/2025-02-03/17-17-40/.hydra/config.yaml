@@ -1,0 +1,24 @@
+logging:
+  _target_: impls.utils.log_utils.setup_wandb
+  _partial_: true
+  mode: online
+  save_code: false
+  group: Debug
+  project: OGBench
+  entity: null
+seed: 42
+env_name: pointmaze-medium-navigate-v0
+save_dir: impls/exp/
+restore_path: null
+restore_epoch: null
+train_steps: 1000000
+log_interval: 5000
+eval_interval: 100000
+save_interval: 1000000
+eval_tasks: null
+eval_episodes: 1
+eval_temperature: 0
+eval_gaussian: null
+video_episodes: 1
+video_frame_skip: 3
+eval_on_cpu: 0

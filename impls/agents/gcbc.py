@@ -5,9 +5,9 @@ import jax
 import jax.numpy as jnp
 import ml_collections
 import optax
-from utils.encoders import GCEncoder, encoder_modules
-from utils.flax_utils import ModuleDict, TrainState, nonpytree_field
-from utils.networks import GCActor, GCDiscreteActor
+from impls.utils.encoders import GCEncoder, encoder_modules
+from impls.utils.flax_utils import ModuleDict, TrainState, nonpytree_field
+from impls.utils.networks import GCActor, GCDiscreteActor
 
 
 class GCBCAgent(flax.struct.PyTreeNode):
@@ -95,10 +95,10 @@ class GCBCAgent(flax.struct.PyTreeNode):
             ex_actions: Example batch of actions. In discrete-action MDPs, this should contain the maximum action value.
             config: Configuration dictionary.
         """
-        rng = jax.random.PRNGKey(seed)
+        rng = jax.random.key(seed)
         rng, init_rng = jax.random.split(rng, 2)
 
-        ex_goals = ex_observations
+        ex_goals = ex_observations # not always
         if config['discrete']:
             action_dim = ex_actions.max() + 1
         else:
