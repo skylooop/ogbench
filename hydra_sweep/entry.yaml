@@ -13,7 +13,7 @@ eval_interval: 100_000
 save_interval: 1_000_000
 
 eval_tasks: null
-eval_episodes: 1
+eval_episodes: 50
 eval_temperature: 0
 eval_gaussian: null
 video_episodes: 1
