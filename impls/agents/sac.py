@@ -7,7 +7,7 @@ import jax.numpy as jnp
 import ml_collections
 import optax
 from impls.utils.flax_utils import ModuleDict, TrainState, nonpytree_field
-from impls.utils.networks import GCActor, GCValue, LogParam
+from impls.utils.networks import GCActor, GCDiscreteActor, GCValue, LogParam
 
 
 class SACAgent(flax.struct.PyTreeNode):
@@ -138,6 +138,7 @@ class SACAgent(flax.struct.PyTreeNode):
         ex_observations,
         ex_actions,
         config,
+        discrete=False
     ):
         """Create a new agent.
 
@@ -150,7 +151,10 @@ class SACAgent(flax.struct.PyTreeNode):
         rng = jax.random.PRNGKey(seed)
         rng, init_rng = jax.random.split(rng, 2)
 
-        action_dim = ex_actions.shape[-1]
+        if discrete:
+            action_dim = ex_actions.max() + 1
+        else:
+            action_dim = ex_actions.shape[-1]
 
         if config['target_entropy'] is None:
             config['target_entropy'] = -config['target_entropy_multiplier'] * action_dim
@@ -161,17 +165,22 @@ class SACAgent(flax.struct.PyTreeNode):
             layer_norm=config['layer_norm'],
             ensemble=True,
         )
-
-        actor_def = GCActor(
-            hidden_dims=config['actor_hidden_dims'],
-            action_dim=action_dim,
-            log_std_min=-5,
-            tanh_squash=config['tanh_squash'],
-            state_dependent_std=config['state_dependent_std'],
-            const_std=False,
-            final_fc_init_scale=config['actor_fc_scale'],
-        )
-
+        if not discrete:
+            actor_def = GCActor(
+                hidden_dims=config['actor_hidden_dims'],
+                action_dim=action_dim,
+                log_std_min=-5,
+                tanh_squash=config['tanh_squash'],
+                state_dependent_std=config['state_dependent_std'],
+                const_std=False,
+                final_fc_init_scale=config['actor_fc_scale'],
+            )
+        else:
+            actor_def = GCDiscreteActor(
+                hidden_dims=config['actor_hidden_dims'],
+                action_dim=action_dim,
+                final_fc_init_scale=config['actor_fc_scale'],
+            )
         # Define the dual alpha variable.
         alpha_def = LogParam()
 
@@ -200,9 +209,9 @@ def get_config():
         dict(
             agent_name='sac',  # Agent name.
             lr=1e-4,  # Learning rate.
-            batch_size=256,  # Batch size.
-            actor_hidden_dims=(256, 256),  # Actor network hidden dimensions.
-            value_hidden_dims=(256, 256),  # Value network hidden dimensions.
+            batch_size=512,  # Batch size.
+            actor_hidden_dims=(512, 512),  # Actor network hidden dimensions.
+            value_hidden_dims=(512, 512),  # Value network hidden dimensions.
             layer_norm=False,  # Whether to use layer normalization.
             discount=0.99,  # Discount factor.
             tau=0.005,  # Target network update rate.
