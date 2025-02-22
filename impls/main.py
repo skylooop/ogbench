@@ -85,7 +85,7 @@ def main(cfg: DictConfig):
         example_batch['actions'],
         config,
     )
-
+    
     # Restore agent.
     if cfg.restore_path is not None:
         agent = restore_agent(agent, cfg.restore_path, cfg.restore_epoch)

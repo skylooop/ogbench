@@ -13,7 +13,7 @@
             "args": [
                 "--env_name=pointmaze-medium-navigate-v0",
                 "--eval_episodes=1",
-                "--agent=agents/gcbc.py"
+                "--agent=agents/gciql.py"
             ]
         }
     ]

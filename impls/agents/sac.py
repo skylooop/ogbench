@@ -21,7 +21,7 @@ class SACAgent(flax.struct.PyTreeNode):
         """Compute the SAC critic loss."""
         next_dist = self.network.select('actor')(batch['next_observations'])
         next_actions, next_log_probs = next_dist.sample_and_log_prob(seed=rng)
-
+        
         next_qs = self.network.select('target_critic')(batch['next_observations'], next_actions)
         if self.config['min_q']:
             next_q = jnp.min(next_qs, axis=0)
@@ -62,10 +62,11 @@ class SACAgent(flax.struct.PyTreeNode):
 
         total_loss = actor_loss + alpha_loss
 
-        if self.config['tanh_squash']:
-            action_std = dist._distribution.stddev()
-        else:
-            action_std = dist.stddev().mean()
+        if not self.config['discrete']:
+            if self.config['tanh_squash']:
+                action_std = dist._distribution.stddev()
+            else:
+                action_std = dist.stddev().mean()
 
         return total_loss, {
             'total_loss': total_loss,
@@ -73,7 +74,7 @@ class SACAgent(flax.struct.PyTreeNode):
             'alpha_loss': alpha_loss,
             'alpha': alpha,
             'entropy': -log_probs.mean(),
-            'std': action_std.mean(),
+            # 'std': action_std.mean(),
         }
 
     @jax.jit
@@ -150,7 +151,7 @@ class SACAgent(flax.struct.PyTreeNode):
         """
         rng = jax.random.PRNGKey(seed)
         rng, init_rng = jax.random.split(rng, 2)
-
+        
         if discrete:
             action_dim = ex_actions.max() + 1
         else:
@@ -158,7 +159,8 @@ class SACAgent(flax.struct.PyTreeNode):
 
         if config['target_entropy'] is None:
             config['target_entropy'] = -config['target_entropy_multiplier'] * action_dim
-
+        ex_actions = jnp.atleast_1d(jnp.array(ex_actions))
+        
         # Define critic and actor networks.
         critic_def = GCValue(
             hidden_dims=config['value_hidden_dims'],
@@ -210,11 +212,12 @@ def get_config():
             agent_name='sac',  # Agent name.
             lr=1e-4,  # Learning rate.
             batch_size=512,  # Batch size.
-            actor_hidden_dims=(512, 512),  # Actor network hidden dimensions.
-            value_hidden_dims=(512, 512),  # Value network hidden dimensions.
-            layer_norm=False,  # Whether to use layer normalization.
+            actor_hidden_dims=(512, 512, 512),  # Actor network hidden dimensions.
+            value_hidden_dims=(512, 512, 512),  # Value network hidden dimensions.
+            layer_norm=True,  # Whether to use layer normalization.
             discount=0.99,  # Discount factor.
             tau=0.005,  # Target network update rate.
+            discrete=False,
             target_entropy=ml_collections.config_dict.placeholder(float),  # Target entropy (None for automatic tuning).
             target_entropy_multiplier=0.5,  # Multiplier to dim(A) for target entropy.
             tanh_squash=True,  # Whether to squash actions with tanh.
